@@ -222,7 +222,7 @@ class Game(Tk):
 
         elif (self.gamestate == STATE_O_TURN):
             # x and y to change by AI
-            y, x, _ = minimax(self.board, -1)
+            y, x, _ = minimax(self.board, -1, 0)
             self.new_move(O, x, y)
 
             if self.has_won(O):

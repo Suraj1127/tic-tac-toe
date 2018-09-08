@@ -8,7 +8,7 @@ Description: AI algorithm, minimax, to solve the tic tac toe problem.
 import numpy as np
 
 inf = np.inf
-
+no_of_steps = 0
 
 def get_empty_cells(grid):
     """
@@ -35,9 +35,9 @@ def game_score(grid):
 
     # -1 is the human, 1 is the computer
     if is_winner(grid, -1):
-        return -1
+        return -100
     elif is_winner(grid, 1):
-        return 1
+        return 100
     else:
         return 0
 
@@ -87,7 +87,7 @@ def show(grid, move, player=None):
     print(np.array(grid))
 
 
-def minimax(grid, player):
+def minimax(grid, player, no_of_steps):
     """
     Minimax AI algorithm to find the best move.
     :param grid: the current structure of grid/board where the match is being played
@@ -123,19 +123,26 @@ def minimax(grid, player):
 
     # Get the unticked/unplayed calls as empty_cells(dtype: array).
     empty_cells = get_empty_cells(grid)
+
     # Iterate in the empty cells.
     for i in empty_cells:
         # Play move.
         grid[i[0]][i[1]] = player
+        no_of_steps += 1
 
         # Calculate score(best array) by recursively doing
         # depth first search along the possible arrangements.
 
         # player changes to -player as player changes in each turn.
-        score = minimax(grid, -player)
+        score = minimax(grid, -player, no_of_steps+1)
+
+        # This is done to put no of steps into equation too.  This would make the move
+        # to win in less number of steps.
+        score[2] = score[2] - player*no_of_steps
 
         # Revert the played move for the depth first search.
         grid[i[0]][i[1]] = 0
+        no_of_steps -= 1
 
         # Save the values of indices to first two indices of score array.
         score[0], score[1] = i[0], i[1]
@@ -168,10 +175,11 @@ def main():
     ]
 
     # Generate move and do the move.
-    move = minimax(grid, +1)
+    move = minimax(grid, +1, 0)
 
     # Show the grid after playing the generated move.
     show(grid, move, +1)
+
 
 if __name__ == "__main__":
     main()
