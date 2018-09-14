@@ -11,10 +11,12 @@ The repository is implementation of AI in Tic Tac Toe game using Minimax algorit
 - Numpy (Python scientific computing library)
 
 ## Instructions:
-* Run python program tic_tac_toe.py and start the program.
-* Play the first move and AI plays the next move.  After human's each move, AI move would be automatically played.
+* Run python program game.py and start the program.
+* Select the 'Human Turn' to decide who plays first.  After human's each move, AI move would be automatically played.
 
-## Further Possible Improvements:
+## Improvements:
 * Here, first player is always set to human.  We can have user set the configurations.
-* No of steps is not taking while calculating evaluation function/state.  We can take it into account.  Though for this game, it is not super useful, but for other complex games like chess, bagchal, etc, it is mandatory to finish up the game sooner.
+* No of steps is not taken into consideration while calculating evaluation function/state.  We can take it into account.  Though for this game, it is not super useful, but for other complex games like chess, bagchal, etc, it is mandatory to finish up the game sooner.
 
+## Possible Improvements:
+* Alpha Beta pruning is not used for reducing time.  As the depth and breadth is not quite large, speed has not been an issue.  But it can be implemented as a practice here too.  Alpha Beta pruning is super useful for complex programs.
