@@ -1,16 +1,7 @@
 #!/usr/bin/env python3
 
 """
-Author: Suraj Regmi
-Date: 23rd August, 2018
-Description: Tic Tac Toe game using minimax AI algorithm
-
-Creative Commons Licence attribution:
-[Code from following stackexchange answer has been taken as reference for the UI]
-https://codereview.stackexchange.com/questions/155692/simple-tic-tac-toe-using-tkinter
-
-The licence with which the distribution is made is:
-https://creativecommons.org/licenses/by-sa/3.0/
+UI for the Tic Tac Toe game.
 """
 
 import numpy as np
@@ -18,51 +9,8 @@ inf = np.inf
 
 from tkinter import *
 
+from parameters import *
 from ai import *
-
-# Program parameters
-
-# Graphics in pixels
-WINDOW_WIDTH = 600
-LINE_WIDTH = 5
-SYMBOL_WIDTH = WINDOW_WIDTH/15
-
-# Symbol Size is relative size of symbol with respect to the size of a single cell
-# i.e SYMBOL_SIZE = size of a cell/size of the symbol
-RELATIVE_SYMBOL_SIZE = 0.5
-
-# Setting color of the symbols
-X_COLOR = 'blue'
-O_COLOR = 'red'
-
-# Set colors
-# DRAW_SCREEN_COLOR: color displayed in the end when game becomes draw
-# LINE_COLOR: color of the grid
-# BG_COLOR: background color of the grid
-DRAW_SCREEN_COLOR = 'light sea green'
-LINE_COLOR = 'grey'
-BG_COLOR = 'white'
-
-# Set which player plays first move
-# 1 => X, -1 => O
-FIRST_PLAYER = 1 # 1 - X, 2 = O
-
-# Set size of the cell with relative to window size
-CELL_SIZE = WINDOW_WIDTH / 3
-
-# Set states of the game
-# 0 means the game has not yet started
-# 1 means X turn, -1 means 0 turn and 3 means the game is over
-STATE_START_SCREEN = 0
-STATE_X_TURN = 1
-STATE_O_TURN = -1
-STATE_GAME_OVER = 3
-
-# Values in the grid representing the board structure
-EMPTY = 0
-X = 1
-O = -1
-
 
 class Game(Tk):
     """
@@ -77,6 +25,22 @@ class Game(Tk):
         self.title('Tic Tac Toe')
         self.canvas.pack()
 
+        # for configuration of who plays first
+
+        menubar = Menu(self)
+
+        # create a pulldown menu, and add it to the menu bar
+        filemenu = Menu(menubar, tearoff=0)
+        filemenu.add_command(label="First", command=self.human_first)
+        filemenu.add_command(label="Second", command=self.computer_first)
+        menubar.add_cascade(label="Human Turn", menu=filemenu)
+
+        # create a quit menu, and add it to the menu bar
+        menubar.add_command(label='Quit', command=self.quit)
+
+        # display the menu
+        self.config(menu=menubar)
+
         self.bind('<x>', self.exit)
         self.canvas.bind('<Button-1>', self.click)
 
@@ -88,6 +52,14 @@ class Game(Tk):
             [EMPTY, EMPTY, EMPTY],
             [EMPTY, EMPTY, EMPTY],
         ]
+
+        # functions for setting who plays first
+
+    def human_first(self):
+        self.first = 'HUMAN'
+
+    def computer_first(self):
+        self.first = 'COMPUTER'
 
     def start_screen(self):
         """
@@ -115,12 +87,23 @@ class Game(Tk):
             int(WINDOW_WIDTH/2),
             int(WINDOW_WIDTH/2),
             text='<< Play >>', fill='#111',
-            font=('Franklin Gothic', int(-WINDOW_WIDTH/25)))
+            font=('Franklin Gothic', int(-WINDOW_WIDTH/25))
+        )
+
+        self.canvas.create_text(
+            int(WINDOW_WIDTH / 2),
+            int(2*WINDOW_WIDTH / 3.5),
+            text='*Please select the \'Human Turn\' and click on the << Play >> button.', fill='#111',
+            font=('Franklin Gothic', int(-WINDOW_WIDTH / 40))
+        )
 
     def new_board(self):
         """
         Clears canvas and draw the new board in the canvas.
         """
+
+        # set who plays first
+        self.first
 
         # Delete all the objects in the canvas
         self.canvas.delete('all')
@@ -185,7 +168,7 @@ class Game(Tk):
                 font=('Franklin Gothic', int(-WINDOW_WIDTH/25))
         )
 
-    def click(self, event):
+    def click(self, event=None):
         """
         When user clicks in anywhere in the screen, this method
         is called.  Event is the click event.
@@ -194,8 +177,15 @@ class Game(Tk):
         y = self.ptgrid(event.y)
 
         if self.gamestate == STATE_START_SCREEN:
+
             self.new_board()
             self.gamestate = FIRST_PLAYER
+
+            if self.first == 'COMPUTER':
+                move = np.random.choice([0, 1, 2], 2)
+
+                self.new_move(O, move[0], move[1])
+                self.gamestate = STATE_X_TURN
 
 
         # Ensure that the turn is of X and the place where clicked
@@ -237,7 +227,10 @@ class Game(Tk):
                 self.gamestate = STATE_X_TURN
 
         elif self.gamestate == STATE_GAME_OVER:
-            #reset
+
+            # reset by destroying the created object and run the program again
+            self.destroy()
+            main()
             self.new_board()
             self.gamestate = FIRST_PLAYER
 
